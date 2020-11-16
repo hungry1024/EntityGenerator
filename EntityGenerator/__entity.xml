@@ -6,7 +6,7 @@
   <Templates>
     <Template type="1" name="数据库实体" fileName ="{entity}" path="">
       <![CDATA[
-/*
+/* 
  * 本文件的代码自动生成，请勿更改
  * =========================== */
 
