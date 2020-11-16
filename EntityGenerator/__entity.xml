@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EntityGenerator>
+  <ConnectionString dbtype="mysql">
+    Server=192.168.0.229;port=3306;database=jxcu;user=jxcu;password=jxcu0920;Character Set=utf8;
+  </ConnectionString>
+  <Templates>
+    <Template type="1" name="数据库实体" fileName ="{entity}" path="">
+      <![CDATA[
+/*
+ * 本文件的代码自动生成，请勿更改
+ * =========================== */
+
+using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using TY.Microservice.Common.Abstractions;
+
+namespace $entity.nameSpace
+{
+    [Table("$entity.name")]
+    [Serializable]
+    public partial class $entity.className : #if($entity.hasPrimaryKey) Entity<$entity.primaryKeyClr>#end
+    {
+#foreach($c in $entity.cols)
+#if(!$c.inview)
+#if($c.desc != "")
+        /// <summary>
+        /// $c.desc
+        /// </summary>
+#end
+#if($c.iskey)
+        [Key]
+#end
+#if($c.identity)
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+#end
+#if(!$c.allownull)
+        [Required]
+#end
+#if($c.name=="LoginPwd" || $c.name.IndexOf("pwd") >-1 || $c.name.IndexOf("password") >-1 )
+        [field:NonSerialized]
+#end
+#if($c.clrtype == "string" && $c.length != -1)
+        [MaxLength($c.length)]
+#end
+        [Column("$c.name"#if($c.length>0),TypeName ="$c.coltype" #end)] 
+#if($c.desc != "")
+        [Display(Name="$c.desc")]
+#else
+        [Display(Name="$c.name")]
+#end
+#end
+        public $c.clrtype $c.entityName { get; set; }
+
+#end
+
+
+#foreach($e in $entity.cols)
+#if($e.hasEnum)
+        [NotMapped]
+        public $e.getColumnEnum.enumName $e.getColumnEnum.columnName  {
+            get {
+#if($e.clrtype == "string")
+                return ($e.getColumnEnum.enumName)Enum.Parse(typeof($e.getColumnEnum.enumName), $e.entityName, true);
+#else
+                return ($e.getColumnEnum.enumName)this.$e.entityName;
+#end
+            }
+            set {
+#if($e.clrtype == "string")
+                this.$e.entityName = value.ToString();
+#else
+                this.$e.entityName = ($e.clrtype)value;
+#end
+                
+            }
+        }
+#end
+#end
+
+
+#if($entity.hasEnums)
+#foreach($e in $entity.enumLists)
+        public enum $e.enumName 
+        {
+#foreach($t in $e.columnEnumInfos)
+            [Description("$t.enumDesc")]
+            $t.enumKey,
+#end
+        }
+#end
+#end
+
+
+    }
+
+}
+]]>
+    </Template>
+  </Templates>
+  <Filters>
+    <Filter>syncobj_0x[\d]+</Filter>
+    <Filter>MSpeer_.*</Filter>
+    <Filter>MSpub_.*</Filter>
+    <Filter>sysdiagrams</Filter>
+    <Filter>sysarticlecolumns</Filter>
+    <Filter>sysarticles</Filter>
+    <Filter>sysarticleupdates</Filter>
+    <Filter>syspublications</Filter>
+    <Filter>sysreplservers</Filter>
+    <Filter>sysschemaarticles</Filter>
+    <Filter>syssubscriptions</Filter>
+    <Filter>systranschemas</Filter>
+    <Filter>sysextendedarticlesview</Filter>
+  </Filters>
+</EntityGenerator>

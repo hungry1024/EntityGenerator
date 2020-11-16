@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29201.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityGenerator", "EntityGenerator\EntityGenerator.csproj", "{317B3F10-A16A-4D10-97DD-B53425B81324}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityGenerator.Signature", "EntityGenerator.Signature\EntityGenerator.Signature.csproj", "{BA4C918A-1F8D-4279-8F7A-CD689891E17D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{317B3F10-A16A-4D10-97DD-B53425B81324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{317B3F10-A16A-4D10-97DD-B53425B81324}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{317B3F10-A16A-4D10-97DD-B53425B81324}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{317B3F10-A16A-4D10-97DD-B53425B81324}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA4C918A-1F8D-4279-8F7A-CD689891E17D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA4C918A-1F8D-4279-8F7A-CD689891E17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA4C918A-1F8D-4279-8F7A-CD689891E17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA4C918A-1F8D-4279-8F7A-CD689891E17D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E39E55D0-C6D5-4457-BE21-05FE92833A6D}
+	EndGlobalSection
+EndGlobal
