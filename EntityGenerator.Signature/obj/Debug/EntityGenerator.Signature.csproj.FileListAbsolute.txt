@@ -1,7 +1,0 @@
-D:\MyProjects\EntityGenerator\EntityGenerator.Signature\bin\Debug\EntityGenerator.Signature.exe.config
-D:\MyProjects\EntityGenerator\EntityGenerator.Signature\bin\Debug\EntityGenerator.Signature.exe
-D:\MyProjects\EntityGenerator\EntityGenerator.Signature\bin\Debug\EntityGenerator.Signature.pdb
-D:\MyProjects\EntityGenerator\EntityGenerator.Signature\obj\Debug\EntityGenerator.Signature.csprojAssemblyReference.cache
-D:\MyProjects\EntityGenerator\EntityGenerator.Signature\obj\Debug\EntityGenerator.Signature.exe
-D:\MyProjects\EntityGenerator\EntityGenerator.Signature\obj\Debug\EntityGenerator.Signature.pdb
-D:\MyProjects\EntityGenerator\EntityGenerator.Signature\obj\Debug\EntityGenerator.Signature.csproj.CoreCompileInputs.cache
