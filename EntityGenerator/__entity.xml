@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <EntityGenerator>
   <ConnectionString dbtype="mysql">
-    Server=192.168.0.229;port=3306;database=jxcu;user=jxcu;password=jxcu0920;Character Set=utf8;
+	  Server=218.107.49.181,1499;Database=CloudSky;Uid=sa;Password=Tycad$202;MultipleActiveResultSets=true;Connection Timeout=300;
   </ConnectionString>
   <Templates>
     <Template type="1" name="数据库实体" fileName ="{entity}" path="">

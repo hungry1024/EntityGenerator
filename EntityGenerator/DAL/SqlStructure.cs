@@ -180,7 +180,7 @@ namespace EntityGenerator.DAL
 						ELSE [tpes].[name] END AS columnType
                     FROM sys.objects objs
                     INNER JOIN sys.columns cols ON objs.object_id = cols.object_id
-                    INNER JOIN sys.types tpes on cols.system_type_id = tpes.system_type_id AND tpes.[name] <> 'sysname'
+                    INNER JOIN sys.types tpes on cols.system_type_id = tpes.system_type_id AND cols.user_type_id = tpes.user_type_id AND tpes.[name] <> 'sysname'
                     LEFT OUTER JOIN sys.identity_columns idns ON idns.object_id = objs.object_id AND idns.column_id = cols.column_id
                     LEFT OUTER JOIN sys.extended_properties pros ON pros.major_id = cols.object_id AND pros.minor_id = cols.column_id
                     WHERE objs.[type] = 'U'
@@ -200,7 +200,8 @@ namespace EntityGenerator.DAL
                             allownull = reader.GetBoolean(4),
                             identity = reader.GetInt32(5) > 0,
                             desc = reader.GetString(6),
-                            iskey = reader.GetInt32(7) > 0
+                            iskey = reader.GetInt32(7) > 0,
+                            coltype = reader.GetString(8)
                         });
                     }
                 }
