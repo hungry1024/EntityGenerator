@@ -1,4 +1,5 @@
-﻿using EntityGenerator.Models;
+﻿using EntityGenerator.Extents;
+using EntityGenerator.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,7 +13,7 @@ namespace EntityGenerator.DAL
     {
         private List<string> tableList;
         private List<string> viewList;
-        private List<string> filters;
+        private readonly SqlType _dbtype;
 
         private ILookup<string, ColumnInfo> tableLookup;
         private ILookup<string, ColumnInfo> viewLookup;
@@ -22,6 +23,8 @@ namespace EntityGenerator.DAL
         private Dictionary<string, string> tableComments;
 
         private readonly IDbConnection _connection;
+
+        public NameFormatterType EntityNameFormatting { get; set; }
 
         #region Helpers
 
@@ -37,20 +40,24 @@ namespace EntityGenerator.DAL
 
         #endregion
 
-        public SqlStructure(string connString, List<string> filters, SqlType dbtype)
+        public SqlStructure(string connString, IEnumerable<string> filters, SqlType dbtype)
         {
-            this.filters = filters;
-            _connection = DataAccess.GetConnection(connString, dbtype);
-            using (_connection)
+            _dbtype = dbtype;
+            _connection = DataAccess.GetConnection(connString.Trim(), _dbtype);
+            try
             {
                 _connection.Open();
-                tableLookup = GetTableLookup(_connection, dbtype);
-                viewLookup = GetViewLookup(_connection, dbtype);
-                tableComments = GetTableComments(_connection, dbtype);
+                tableLookup = GetTableLookup(_connection);
+                viewLookup = GetViewLookup(_connection);
+                tableComments = GetTableComments(_connection);
 
                 this.tableList = tableLookup.Select(l => l.Key).ToList();
                 this.viewList = viewLookup.Select(l => l.Key).ToList();
                 //foreignList = GetForeignInfo(conn);
+            }
+            finally
+            {
+                _connection.Close();
             }
 
             this.tableList = this.tableList.Where(t => !filters.Any(s => Regex.IsMatch(t, s))).ToList();
@@ -84,9 +91,15 @@ namespace EntityGenerator.DAL
 
         public IEnumerable<ColumnInfo> GetViewSqlColumns(string entity, string viewSql)
         {
-            //if (this.tableLookup.Contains(table))
-            //    return this.tableLookup[table];
-            //return this.viewLookup[table];
+            if (_dbtype == SqlType.MSSql)
+                return GetViewMySqlColumns(entity, viewSql);
+            else if (_dbtype == SqlType.MySql)
+                return GetViewMySqlColumns(entity, viewSql);
+            else throw new Exception("未知的数据库类型");
+        }
+
+        private IEnumerable<ColumnInfo> GetViewMySqlColumns(string entity, string viewSql)
+        {
             if (_connection.State == ConnectionState.Closed)
             {
                 _connection.Open();
@@ -112,11 +125,11 @@ namespace EntityGenerator.DAL
             var columnList = new List<ColumnInfo>();
             foreach (DataRow row in dt.Rows)
             {
-                string type = row["DataTypeString"].ToString().ToLower();
-                int leftBracketIndex = type.IndexOf("(");
+                string sqlType = row["DataTypeString"].ToString();
+                int leftBracketIndex = sqlType.IndexOf("(");
 
                 string colType = row["DataType"].ToString();
-                int commaIndex = type.IndexOf("(");
+                int commaIndex = colType.IndexOf("(");
 
                 string baseTableName = row["BaseTableName"].ToString();
                 string baseColumnName = row["BaseColumnName"].ToString();
@@ -125,7 +138,7 @@ namespace EntityGenerator.DAL
                 {
                     entity = entity,
                     name = row["ColumnName"].ToString(),
-                    type = leftBracketIndex == -1 ? type : type.Substring(0, leftBracketIndex),
+                    type = leftBracketIndex == -1 ? sqlType : sqlType.Substring(0, leftBracketIndex),
                     length = Convert.ToInt32(row["ColumnSize"]),
                     allownull = Convert.ToBoolean(row["AllowDBNull"]),
                     identity = Convert.ToBoolean(row["IsAutoIncrement"]),
@@ -138,11 +151,77 @@ namespace EntityGenerator.DAL
             return columnList;
         }
 
+        private IEnumerable<ColumnInfo> GetViewMSSqlColumns(string entity, string viewSql)
+        {
+            if (_connection.State == ConnectionState.Closed)
+            {
+                _connection.Open();
+            }
+            var cmd = _connection.CreateCommand();
+            cmd.CommandText = $"SELECT * FROM ({viewSql}) AS V WHERE 1=0";
+            cmd.CommandType = CommandType.Text;
+
+            DataTable dt = null;
+
+            using (var reader = cmd.ExecuteReader(CommandBehavior.KeyInfo))
+            {
+                dt = reader.GetSchemaTable();
+
+                dt.Columns.Add("DataTypeString", typeof(string));
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    dt.Rows[i]["DataTypeString"] = reader.GetDataTypeName(i);
+                }
+                dt.AcceptChanges();
+            }
+
+            var columnList = new List<ColumnInfo>();
+            foreach (DataRow row in dt.Rows)
+            {
+                string sqlType = row["DataTypeString"].ToString();
+                string colType;
+                switch (sqlType)
+                {
+                    case "numeric":
+                    case "decimal":
+                        colType = $"{sqlType}({row["NumericPrecision"]},{row["NumericScale"]})";
+                        break;
+                    case "char":
+                    case "nchar":
+                    case "varchar":
+                    case "nvarchar":
+                        colType = $"{sqlType}({row["ColumnSize"]})";
+                        break;
+                    default:
+                        colType = sqlType;
+                        break;
+                }
+
+                string baseTableName = row["BaseTableName"].ToString();
+                string baseColumnName = row["BaseColumnName"].ToString();
+
+                columnList.Add(new ColumnInfo
+                {
+                    entity = entity,
+                    name = row["ColumnName"].ToString(),
+                    type = sqlType,
+                    length = Convert.ToInt32(row["ColumnSize"]),
+                    allownull = Convert.ToBoolean(row["AllowDBNull"]),
+                    identity = Convert.ToBoolean(row["IsAutoIncrement"]),
+                    desc = this.tableLookup[baseTableName].FirstOrDefault(m => m.name == baseColumnName)?.desc ?? row["ColumnName"].ToString(),
+                    iskey = Convert.ToBoolean(row["IsKey"]),
+                    coltype = colType
+                });
+            }
+
+            return columnList;
+        }
+
         public void CloseConnection()
         {
             if (_connection != null && _connection.State != ConnectionState.Closed)
             {
-                _connection.Dispose();
+                _connection.Close();
             }
         }
 
@@ -154,10 +233,10 @@ namespace EntityGenerator.DAL
         }
 
 
-        private ILookup<string, ColumnInfo> GetTableLookup(IDbConnection conn, SqlType sqlType)
+        private ILookup<string, ColumnInfo> GetTableLookup(IDbConnection conn)
         {
             var cmd = conn.CreateCommand();
-            if (sqlType == SqlType.MSSql)
+            if (_dbtype == SqlType.MSSql)
             {
                 cmd.CommandText = @"SELECT 
                     objs.[name] AS entity,
@@ -191,7 +270,7 @@ namespace EntityGenerator.DAL
                 {
                     while (reader.Read())
                     {
-                        columnList.Add(new ColumnInfo
+                        var columnInfo = new ColumnInfo
                         {
                             entity = reader.GetString(0),
                             name = reader.GetString(1),
@@ -201,13 +280,15 @@ namespace EntityGenerator.DAL
                             identity = reader.GetInt32(5) > 0,
                             desc = reader.GetString(6),
                             iskey = reader.GetInt32(7) > 0,
-                            coltype = reader.GetString(8)
-                        });
+                            coltype = reader.GetString(8)  
+                        };
+                        columnInfo.entityName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnList.Add(columnInfo);
                     }
                 }
                 return columnList.OrderBy(c => c.entity).ToLookup(c => c.entity);
             }
-            else if (sqlType == SqlType.MySql)
+            else if (_dbtype == SqlType.MySql)
             {
                 cmd.CommandText = string.Format(@"
 SELECT a.TABLE_NAME,
@@ -231,7 +312,7 @@ ORDER BY a.TABLE_NAME",
                 {
                     while (reader.Read())
                     {
-                        columnList.Add(new ColumnInfo
+                        var columnInfo = new ColumnInfo
                         {
                             entity = reader.GetString(0),
                             name = reader.GetString(1),
@@ -242,7 +323,9 @@ ORDER BY a.TABLE_NAME",
                             desc = reader.GetString(6),
                             iskey = reader.GetString(7) == "PRI",
                             coltype = reader.GetString(8) 
-                        });
+                        };
+                        columnInfo.entityName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnList.Add(columnInfo);
                     }
                 }
                 return columnList.OrderBy(c => c.entity).ToLookup(c => c.entity);
@@ -253,11 +336,11 @@ ORDER BY a.TABLE_NAME",
             }
         }
 
-        private ILookup<string, ColumnInfo> GetViewLookup(IDbConnection conn, SqlType sqlType)
+        private ILookup<string, ColumnInfo> GetViewLookup(IDbConnection conn)
         {
             var cmd = conn.CreateCommand();
 
-            if (sqlType == SqlType.MSSql)
+            if (_dbtype == SqlType.MSSql)
             {
                 cmd.CommandText = @"
                 SELECT
@@ -292,7 +375,7 @@ ORDER BY a.TABLE_NAME",
                 {
                     while (reader.Read())
                     {
-                        columnList.Add(new ColumnInfo
+                        var columnInfo = new ColumnInfo
                         {
                             entity = reader.GetString(0),
                             name = reader.GetString(1),
@@ -303,12 +386,14 @@ ORDER BY a.TABLE_NAME",
                             desc = reader.GetString(6),
                             iskey = reader.GetInt32(7) > 0,
                             inview = true
-                        });
+                        };
+                        columnInfo.entityName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnList.Add(columnInfo);
                     }
                 }
                 return columnList.OrderBy(c => c.entity).ToLookup(c => c.entity);
             }
-            else if (sqlType == SqlType.MySql)
+            else if (_dbtype == SqlType.MySql)
             {
                 cmd.CommandText = string.Format(@"
 SELECT
@@ -333,7 +418,7 @@ ORDER BY a.TABLE_NAME",
                 {
                     while (reader.Read())
                     {
-                        columnList.Add(new ColumnInfo
+                        var columnInfo = new ColumnInfo
                         {
                             entity = reader.GetString(0),
                             name = reader.GetString(1),
@@ -344,7 +429,9 @@ ORDER BY a.TABLE_NAME",
                             desc = reader.GetString(6),
                             iskey = reader.GetString(7) == "PRI",
                             coltype = reader.GetString(8)
-                        });
+                        };
+                        columnInfo.entityName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnList.Add(columnInfo);
                     }
                 }
 
@@ -356,11 +443,11 @@ ORDER BY a.TABLE_NAME",
             }
         }
 
-        private Dictionary<string, string> GetTableComments(IDbConnection conn, SqlType sqlType)
+        private Dictionary<string, string> GetTableComments(IDbConnection conn)
         {
             var result = new Dictionary<string, string>();
             var cmd = conn.CreateCommand();
-            if (sqlType == SqlType.MSSql)
+            if (_dbtype == SqlType.MSSql)
             {
                 cmd.CommandText = @"SELECT tbs.name,ds.value      
 FROM sysobjects AS tbs 
@@ -375,7 +462,7 @@ WHERE  ds.minor_id=0 AND [tbs].[xtype]='u'";
                     return result;
                 }
             }
-            else if (sqlType == SqlType.MySql)
+            else if (_dbtype == SqlType.MySql)
             {
                 cmd.CommandText = $@"
 SELECT TABLE_NAME,TABLE_COMMENT FROM information_schema.`TABLES` WHERE TABLE_SCHEMA ='{conn.Database}'";

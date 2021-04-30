@@ -46,6 +46,9 @@
             this.unexistsList = new System.Windows.Forms.CheckedListBox();
             this.tabCreate = new System.Windows.Forms.TabControl();
             this.tabEntity = new System.Windows.Forms.TabPage();
+            this.btnLoad = new System.Windows.Forms.Button();
+            this.txtEntitiesDirectory = new System.Windows.Forms.TextBox();
+            this.lbl_namespace = new System.Windows.Forms.Label();
             this.tabSqlView = new System.Windows.Forms.TabPage();
             this.btnClose2 = new System.Windows.Forms.Button();
             this.ddlViewEntityDirectory = new System.Windows.Forms.ComboBox();
@@ -64,8 +67,6 @@
             this.btnSqlViewSelectNone = new System.Windows.Forms.Button();
             this.btnSqlViewSelectAll = new System.Windows.Forms.Button();
             this.cbSqlViewAdded = new System.Windows.Forms.CheckedListBox();
-            this.lbl_namespace = new System.Windows.Forms.Label();
-            this.tbx_namespace = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -86,7 +87,7 @@
             this.addedList.FormattingEnabled = true;
             this.addedList.HorizontalScrollbar = true;
             this.addedList.Location = new System.Drawing.Point(16, 20);
-            this.addedList.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.addedList.Margin = new System.Windows.Forms.Padding(5);
             this.addedList.Name = "addedList";
             this.addedList.Size = new System.Drawing.Size(213, 274);
             this.addedList.TabIndex = 0;
@@ -174,7 +175,7 @@
             this.newList.FormattingEnabled = true;
             this.newList.HorizontalScrollbar = true;
             this.newList.Location = new System.Drawing.Point(16, 20);
-            this.newList.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.newList.Margin = new System.Windows.Forms.Padding(5);
             this.newList.Name = "newList";
             this.newList.Size = new System.Drawing.Size(213, 274);
             this.newList.TabIndex = 0;
@@ -241,7 +242,7 @@
             this.unexistsList.FormattingEnabled = true;
             this.unexistsList.HorizontalScrollbar = true;
             this.unexistsList.Location = new System.Drawing.Point(16, 20);
-            this.unexistsList.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.unexistsList.Margin = new System.Windows.Forms.Padding(5);
             this.unexistsList.Name = "unexistsList";
             this.unexistsList.Size = new System.Drawing.Size(213, 274);
             this.unexistsList.TabIndex = 0;
@@ -260,7 +261,8 @@
             // 
             // tabEntity
             // 
-            this.tabEntity.Controls.Add(this.tbx_namespace);
+            this.tabEntity.Controls.Add(this.btnLoad);
+            this.tabEntity.Controls.Add(this.txtEntitiesDirectory);
             this.tabEntity.Controls.Add(this.lbl_namespace);
             this.tabEntity.Controls.Add(this.groupBox1);
             this.tabEntity.Controls.Add(this.btnCancel);
@@ -269,11 +271,37 @@
             this.tabEntity.Controls.Add(this.groupBox2);
             this.tabEntity.Location = new System.Drawing.Point(4, 32);
             this.tabEntity.Name = "tabEntity";
-            this.tabEntity.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabEntity.Padding = new System.Windows.Forms.Padding(3);
             this.tabEntity.Size = new System.Drawing.Size(762, 396);
             this.tabEntity.TabIndex = 0;
             this.tabEntity.Text = "DB实体";
             this.tabEntity.UseVisualStyleBackColor = true;
+            // 
+            // btnLoad
+            // 
+            this.btnLoad.Location = new System.Drawing.Point(260, 367);
+            this.btnLoad.Name = "btnLoad";
+            this.btnLoad.Size = new System.Drawing.Size(75, 23);
+            this.btnLoad.TabIndex = 8;
+            this.btnLoad.Text = "加载";
+            this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
+            // 
+            // txtEntitiesDirectory
+            // 
+            this.txtEntitiesDirectory.Location = new System.Drawing.Point(62, 369);
+            this.txtEntitiesDirectory.Name = "txtEntitiesDirectory";
+            this.txtEntitiesDirectory.Size = new System.Drawing.Size(188, 21);
+            this.txtEntitiesDirectory.TabIndex = 7;
+            // 
+            // lbl_namespace
+            // 
+            this.lbl_namespace.AutoSize = true;
+            this.lbl_namespace.Location = new System.Drawing.Point(3, 372);
+            this.lbl_namespace.Name = "lbl_namespace";
+            this.lbl_namespace.Size = new System.Drawing.Size(65, 12);
+            this.lbl_namespace.TabIndex = 6;
+            this.lbl_namespace.Text = "实体目录：";
             // 
             // tabSqlView
             // 
@@ -288,7 +316,7 @@
             this.tabSqlView.Controls.Add(this.groupBox4);
             this.tabSqlView.Location = new System.Drawing.Point(4, 32);
             this.tabSqlView.Name = "tabSqlView";
-            this.tabSqlView.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabSqlView.Padding = new System.Windows.Forms.Padding(3);
             this.tabSqlView.Size = new System.Drawing.Size(762, 396);
             this.tabSqlView.TabIndex = 1;
             this.tabSqlView.Text = "SqlView实体";
@@ -297,7 +325,7 @@
             // btnClose2
             // 
             this.btnClose2.Location = new System.Drawing.Point(664, 362);
-            this.btnClose2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnClose2.Margin = new System.Windows.Forms.Padding(2);
             this.btnClose2.Name = "btnClose2";
             this.btnClose2.Size = new System.Drawing.Size(88, 32);
             this.btnClose2.TabIndex = 13;
@@ -311,7 +339,7 @@
             this.ddlViewEntityDirectory.Font = new System.Drawing.Font("宋体", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.ddlViewEntityDirectory.FormattingEnabled = true;
             this.ddlViewEntityDirectory.Location = new System.Drawing.Point(317, 374);
-            this.ddlViewEntityDirectory.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ddlViewEntityDirectory.Margin = new System.Windows.Forms.Padding(2);
             this.ddlViewEntityDirectory.Name = "ddlViewEntityDirectory";
             this.ddlViewEntityDirectory.Size = new System.Drawing.Size(151, 21);
             this.ddlViewEntityDirectory.TabIndex = 12;
@@ -343,7 +371,7 @@
             this.cbSqlViewDirectory.Font = new System.Drawing.Font("宋体", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.cbSqlViewDirectory.FormattingEnabled = true;
             this.cbSqlViewDirectory.Location = new System.Drawing.Point(90, 372);
-            this.cbSqlViewDirectory.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cbSqlViewDirectory.Margin = new System.Windows.Forms.Padding(2);
             this.cbSqlViewDirectory.Name = "cbSqlViewDirectory";
             this.cbSqlViewDirectory.Size = new System.Drawing.Size(142, 21);
             this.cbSqlViewDirectory.TabIndex = 9;
@@ -373,7 +401,7 @@
             // btnRemoveSqlViewEntity
             // 
             this.btnRemoveSqlViewEntity.Location = new System.Drawing.Point(153, 319);
-            this.btnRemoveSqlViewEntity.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnRemoveSqlViewEntity.Margin = new System.Windows.Forms.Padding(2);
             this.btnRemoveSqlViewEntity.Name = "btnRemoveSqlViewEntity";
             this.btnRemoveSqlViewEntity.Size = new System.Drawing.Size(75, 23);
             this.btnRemoveSqlViewEntity.TabIndex = 1;
@@ -390,7 +418,7 @@
             this.cbSqlViewNotExists.FormattingEnabled = true;
             this.cbSqlViewNotExists.HorizontalScrollbar = true;
             this.cbSqlViewNotExists.Location = new System.Drawing.Point(16, 20);
-            this.cbSqlViewNotExists.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.cbSqlViewNotExists.Margin = new System.Windows.Forms.Padding(5);
             this.cbSqlViewNotExists.Name = "cbSqlViewNotExists";
             this.cbSqlViewNotExists.Size = new System.Drawing.Size(213, 274);
             this.cbSqlViewNotExists.TabIndex = 0;
@@ -436,7 +464,7 @@
             this.cbSqlViewAdding.FormattingEnabled = true;
             this.cbSqlViewAdding.HorizontalScrollbar = true;
             this.cbSqlViewAdding.Location = new System.Drawing.Point(16, 20);
-            this.cbSqlViewAdding.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.cbSqlViewAdding.Margin = new System.Windows.Forms.Padding(5);
             this.cbSqlViewAdding.Name = "cbSqlViewAdding";
             this.cbSqlViewAdding.Size = new System.Drawing.Size(213, 274);
             this.cbSqlViewAdding.TabIndex = 0;
@@ -482,26 +510,10 @@
             this.cbSqlViewAdded.FormattingEnabled = true;
             this.cbSqlViewAdded.HorizontalScrollbar = true;
             this.cbSqlViewAdded.Location = new System.Drawing.Point(16, 20);
-            this.cbSqlViewAdded.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.cbSqlViewAdded.Margin = new System.Windows.Forms.Padding(5);
             this.cbSqlViewAdded.Name = "cbSqlViewAdded";
             this.cbSqlViewAdded.Size = new System.Drawing.Size(213, 274);
             this.cbSqlViewAdded.TabIndex = 0;
-            // 
-            // lbl_namespace
-            // 
-            this.lbl_namespace.AutoSize = true;
-            this.lbl_namespace.Location = new System.Drawing.Point(6, 368);
-            this.lbl_namespace.Name = "lbl_namespace";
-            this.lbl_namespace.Size = new System.Drawing.Size(59, 12);
-            this.lbl_namespace.TabIndex = 6;
-            this.lbl_namespace.Text = "命名空间:";
-            // 
-            // tbx_namespace
-            // 
-            this.tbx_namespace.Location = new System.Drawing.Point(71, 364);
-            this.tbx_namespace.Name = "tbx_namespace";
-            this.tbx_namespace.Size = new System.Drawing.Size(179, 21);
-            this.tbx_namespace.TabIndex = 7;
             // 
             // FormBatch
             // 
@@ -568,7 +580,8 @@
         private System.Windows.Forms.ComboBox ddlViewEntityDirectory;
         private System.Windows.Forms.Button btnRemoveSqlViewEntity;
         private System.Windows.Forms.Button btnClose2;
-        private System.Windows.Forms.TextBox tbx_namespace;
+        private System.Windows.Forms.TextBox txtEntitiesDirectory;
         private System.Windows.Forms.Label lbl_namespace;
+        private System.Windows.Forms.Button btnLoad;
     }
 }

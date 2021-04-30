@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityGenerator", "EntityGe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityGenerator.Signature", "EntityGenerator.Signature\EntityGenerator.Signature.csproj", "{BA4C918A-1F8D-4279-8F7A-CD689891E17D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityGenerator.Tests", "EntityGenerator.Tests\EntityGenerator.Tests.csproj", "{41CAE428-942E-4F85-84B0-276DA0F438C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{BA4C918A-1F8D-4279-8F7A-CD689891E17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA4C918A-1F8D-4279-8F7A-CD689891E17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA4C918A-1F8D-4279-8F7A-CD689891E17D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41CAE428-942E-4F85-84B0-276DA0F438C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41CAE428-942E-4F85-84B0-276DA0F438C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41CAE428-942E-4F85-84B0-276DA0F438C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41CAE428-942E-4F85-84B0-276DA0F438C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

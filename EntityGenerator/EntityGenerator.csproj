@@ -57,9 +57,10 @@
     <Compile Include="DAL\SqlStructure.cs" />
     <Compile Include="DAL\DataAccess.cs" />
     <Compile Include="Extents\ListExtent.cs" />
-    <Compile Include="Extents\StringExtent.cs" />
+    <Compile Include="Extents\StringExtentions.cs" />
     <Compile Include="Models\ColumnInfo.cs" />
     <Compile Include="Models\ForeignInfo.cs" />
+    <Compile Include="Models\NameFormatterType.cs" />
     <Compile Include="Models\Template.cs" />
     <Compile Include="PackageCmdIDs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,35 +69,11 @@
     <Compile Include="Settings\AutoEntitySettings.cs" />
     <Compile Include="Utilities\ConfigUtil.cs" />
     <Compile Include="Utilities\DTEHelper.cs" />
-    <Compile Include="Views\FormBatchView.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\FormBatchView.designer.cs">
-      <DependentUpon>FormBatchView.cs</DependentUpon>
-    </Compile>
     <Compile Include="Views\FormBatch.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Views\FormBatch.designer.cs">
       <DependentUpon>FormBatch.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\FormConfig.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\FormConfig.designer.cs">
-      <DependentUpon>FormConfig.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\FormRefresh.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\FormRefresh.designer.cs">
-      <DependentUpon>FormRefresh.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\FormTemplate.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\FormTemplate.designer.cs">
-      <DependentUpon>FormTemplate.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -139,20 +116,8 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Views\FormBatchView.resx">
-      <DependentUpon>FormBatchView.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Views\FormBatch.resx">
       <DependentUpon>FormBatch.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\FormConfig.resx">
-      <DependentUpon>FormConfig.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\FormRefresh.resx">
-      <DependentUpon>FormRefresh.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\FormTemplate.resx">
-      <DependentUpon>FormTemplate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -20,13 +20,7 @@ namespace EntityGenerator.Models
         /// <summary>
         /// 实体名称
         /// </summary>
-        public string entityName
-        {
-            get
-            {
-                return name.GetPascalName();
-            }
-        }
+        public string entityName { get; set; }
 
         /// <summary>
         /// 列类型

@@ -11,14 +11,17 @@ using System.Linq;
 using System.Windows.Forms;
 using EntityGenerator.Extents;
 using System.Reflection;
+using Microsoft.VisualStudio.ProjectSystem;
 
 namespace EntityGenerator.Views
 {
     public partial class FormBatch : Form
     {
-        private string _template = null;
+        private Template _template = null;
         private readonly string _currentProjectRootPath;
         private readonly Project _currentProject;
+        private ProjectItems _targetProjectItems;
+        private string _rootNamespace;
 
         private SqlStructure structure;
 
@@ -32,78 +35,103 @@ namespace EntityGenerator.Views
 
         private void FormBatch_Load(object sender, EventArgs e)
         {
-            var templates = ConfigUtil.GetTemplates();
-            _template = templates[0].text;
+            ThreadHelper.ThrowIfNotOnUIThread();
 
-            var dictExistEntities = GetExistsEntities();
+            _rootNamespace = _currentProject.Name;
+            foreach (var pi in _currentProject.Properties)
+            {
+                var property = pi as Property;
+                if (property != null && property.Name == "RootNamespace")
+                {
+                    _rootNamespace = property.Value.ToString();
+                    break;
+                }
+            }
 
+            _template = ConfigUtil.GetTemplates()[0];
+            
             structure.Tables.AddRange(structure.Views);
+            structure.EntityNameFormatting = _template.ClassNameFormatting;
 
-            this.tbx_namespace.Text = GetExistsEntitiesNameSpace(dictExistEntities.FirstOrDefault()).Trim();
-
-            // 已生成的实体
-            foreach (var entity in structure.Tables.Where(w => dictExistEntities.Count(f => f.Equals(w.GetPascalName())) > 0))
-            {
-                this.addedList.Items.Add(entity);
-            }
-
-            // 还没生成的实体
-            foreach (var entity in structure.Tables.Where(w => dictExistEntities.Count(f => f.Equals(w.GetPascalName())) == 0))
-            {
-                this.newList.Items.Add(entity);
-            }
-
-            // 数据库中不存在的实体
-            foreach (var entity in dictExistEntities.Except(structure.Tables.Select(s => s.GetPascalName()), StringComparer.OrdinalIgnoreCase))
-            {
-                this.unexistsList.Items.Add(entity);
-            }
+            InitData();
 
             foreach (ProjectItem item in _currentProject.ProjectItems)
             {
-                if (item.Kind == EnvDTE.Constants.vsProjectItemKindPhysicalFolder)
+                if (item.Kind == Constants.vsProjectItemKindPhysicalFolder)
                 {
                     this.cbSqlViewDirectory.Items.Add(item.Name);
                 }
             }
         }
 
-        private List<string> GetExistsEntities()
+        private void InitData()
         {
-            var entities = new List<string>();
-            foreach (ProjectItem item in _currentProject.ProjectItems)
+            var dictExistEntities = GetExistsEntities();
+
+            // 已生成的实体
+            this.addedList.Items.Clear();
+
+            // 还没生成的实体
+            this.newList.Items.Clear();
+
+            foreach (var entity in structure.Tables)
             {
-                if (item.Name.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
-                    entities.Add(item.Name.TrimSuffix(".cs", StringComparison.OrdinalIgnoreCase));
+                if (dictExistEntities.Any(f => f.Equals(entity.GetPascalName(_template.ClassNameFormatting), StringComparison.OrdinalIgnoreCase)))
+                {
+                    this.addedList.Items.Add(entity);
+                }
+                else
+                {
+                    this.newList.Items.Add(entity);
+                }
             }
-            return entities;
+
+            // 数据库中不存在的实体
+            this.unexistsList.Items.Clear();
+            foreach (var entity in dictExistEntities.Except(structure.Tables.Select(s => s.GetPascalName(_template.ClassNameFormatting)), StringComparer.OrdinalIgnoreCase))
+            {
+                this.unexistsList.Items.Add(entity);
+            }
         }
 
-        private string GetExistsEntitiesNameSpace(string entityName)
+
+        private List<string> GetExistsEntities()
         {
-            if (string.IsNullOrEmpty(entityName))
-                return string.Empty;
-
-            var path = DTEHelper.GetSelectedProjectPath();
-            var nameSpace = string.Empty;
-            using (var reader = File.OpenText(path + entityName + ".cs"))
+            string entitiesDir = txtEntitiesDirectory.Text.Trim();
+            _targetProjectItems = _currentProject.ProjectItems;
+            if (entitiesDir.Length != 0)
             {
-                while (true)
+                string[] dirs = entitiesDir.Split(new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                
+                foreach (string dir in dirs)
                 {
-                    var _str = reader.ReadLine();
-                    if (_str == null)
-                        break;
-
-                    if (_str.ToLower().Contains("namespace"))
+                    bool exists = false;
+                    foreach (ProjectItem pi in _targetProjectItems)
                     {
-                        nameSpace = _str.Replace("namespace", "");
-                        break;
+                        if(pi.Kind == Constants.vsProjectItemKindPhysicalFolder && string.Equals(dir, pi.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            _targetProjectItems = pi.ProjectItems;
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists)
+                    {
+                        MessageBox.Show($"目录{entitiesDir}不存在", "404", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return new List<string>(0);
                     }
                 }
             }
 
-
-            return nameSpace;
+            string[] notIncluded = { "Program.cs" };
+            var entities = new List<string>();
+            
+            foreach (ProjectItem item in _targetProjectItems)
+            {
+                if (item.Name.EndsWith(".cs", StringComparison.OrdinalIgnoreCase) && !notIncluded.Any(m => m == item.Name))
+                    entities.Add(item.Name.TrimSuffix(".cs", StringComparison.OrdinalIgnoreCase));
+            }
+            return entities;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -115,32 +143,34 @@ namespace EntityGenerator.Views
         {
             try
             {
-                string nameSpaceStr = tbx_namespace.Text;
+                string entitiesDir = txtEntitiesDirectory.Text.Trim();
 
-                if (string.IsNullOrEmpty(nameSpaceStr))
+                string nameSpaceStr = _rootNamespace;     
+                string path = _currentProject.Properties.Item("FullPath").Value.ToString();
+
+                if(entitiesDir.Length != 0)
                 {
-                    MessageBox.Show("请输入命名空间 例：TY.Project.Entities");
-                    return;
+                    string[] dirs = entitiesDir.Split(new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                    nameSpaceStr = $"{nameSpaceStr}.{string.Join(".", dirs)}";
+                    path = Path.Combine(path, string.Join("\\", dirs));
                 }
 
-                var path = _currentProject.Properties.Item("FullPath").Value.ToString();
                 var entities = GetCheckedItems(this.addedList);
                 var views = GetCheckedItems(this.newList);
-                entities.AddRange(views); 
+                entities.AddRange(views);
 
                 foreach (var entity in entities)
                 {
-                    var className = entity.GetPascalName();
-                    var file = path + className + ".cs";
-
+                    var className = entity.GetPascalName(_template.ClassNameFormatting);
+                    var file = Path.Combine(path, className + ".cs");
                     var columns = structure.GetColumns(entity);
                     string comment = structure.GetComment(entity);
                     var enums = columns.Where(w => w.hasEnum).Select(s => s.getColumnEnum).ToList();
  
-                    var content = RefreshService.GetContent(_template, nameSpaceStr, entity, className, columns, comment, enumLists: enums);
+                    var content = RefreshService.GetContent(_template.text, nameSpaceStr, entity, className, columns, comment, enumLists: enums);
 
                     RefreshService.AddOrUpdate(file, content);
-                    _currentProject.ProjectItems.AddFromFile(file);
+                    _targetProjectItems.AddFromFile(file);
                 }
                 MessageBox.Show("OK");
             }
@@ -241,13 +271,11 @@ namespace EntityGenerator.Views
             var path = _currentProject.Properties.Item("FullPath").Value.ToString();
             foreach (var entity in entities)
             {
-                foreach (ProjectItem item in _currentProject.ProjectItems)
+                foreach (ProjectItem item in _targetProjectItems)
                 {
                     if (item.Name.TrimSuffix(".cs", StringComparison.OrdinalIgnoreCase) == entity)
                     {
                         item.Remove();
-                        //var file = path + item.Name;
-                        //File.Delete(file);
                     }
                 }
             }
@@ -411,7 +439,6 @@ namespace EntityGenerator.Views
                     if (item.Name.TrimSuffix(".cs", StringComparison.OrdinalIgnoreCase) == entity)
                     {
                         item.Remove();
-                        item.Delete();
                     }
                 }
             }
@@ -428,13 +455,8 @@ namespace EntityGenerator.Views
 
             string entityDirectory = ddlViewEntityDirectory.SelectedIndex == 0 ? string.Empty : ddlViewEntityDirectory.SelectedItem.ToString();
             string sqlViewDirectory = cbSqlViewDirectory.SelectedItem.ToString();
-            string nameSpaceStr = tbx_namespace.Text;
+            string nameSpaceStr = txtEntitiesDirectory.Text;
 
-            if (string.IsNullOrEmpty(nameSpaceStr))
-            {
-                MessageBox.Show("请输入命名空间 例：TY.Project.Entities");
-                return;
-            }
             try
             {
                 var path = _currentProject.Properties.Item("FullPath").Value.ToString();
@@ -443,7 +465,7 @@ namespace EntityGenerator.Views
                 entities.AddRange(views);
                 foreach (var entity in entities)
                 {
-                    var className = entity.GetPascalName();
+                    var className = entity.GetPascalName(_template.ClassNameFormatting);
                     var file = Path.Combine(path, entityDirectory, className + ".cs");
 
                     var sqlpath = Path.Combine(path, sqlViewDirectory, entity + ".sql");
@@ -451,7 +473,7 @@ namespace EntityGenerator.Views
 
                     var columns = structure.GetViewSqlColumns(entity, viewSql);
 
-                    var content = RefreshService.GetContent(_template, nameSpaceStr, entity, className, columns, null, viewSql);
+                    var content = RefreshService.GetContent(_template.text, nameSpaceStr, entity, className, columns, null, viewSql);
 
                     RefreshService.AddOrUpdate(file, content);
                     _currentProject.ProjectItems.AddFromFile(file);
@@ -471,6 +493,11 @@ namespace EntityGenerator.Views
         private void btnClose2_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            InitData();
         }
     }
 }
