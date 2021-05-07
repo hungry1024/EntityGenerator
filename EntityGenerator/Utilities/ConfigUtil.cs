@@ -41,8 +41,8 @@ namespace EntityGenerator.Utilities
                     type = el.GetAttribute("type"),
                     name = el.GetAttribute("name"),
                     fileName = el.GetAttribute("fileName"),
-                    path = el.GetAttribute("path"),
-                    classNameFormatter = el.GetAttribute("classNameFormatter"),
+                    path = el.GetAttribute("path")?.Trim(),
+                    classNameFormatter = el.GetAttribute("classNameFormatter")?.Trim(),
                     text = el.InnerText.Trim()
                 });
             }

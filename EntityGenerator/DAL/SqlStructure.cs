@@ -92,7 +92,7 @@ namespace EntityGenerator.DAL
         public IEnumerable<ColumnInfo> GetViewSqlColumns(string entity, string viewSql)
         {
             if (_dbtype == SqlType.MSSql)
-                return GetViewMySqlColumns(entity, viewSql);
+                return GetViewMSSqlColumns(entity, viewSql);
             else if (_dbtype == SqlType.MySql)
                 return GetViewMySqlColumns(entity, viewSql);
             else throw new Exception("未知的数据库类型");
@@ -134,7 +134,7 @@ namespace EntityGenerator.DAL
                 string baseTableName = row["BaseTableName"].ToString();
                 string baseColumnName = row["BaseColumnName"].ToString();
 
-                columnList.Add(new ColumnInfo
+                var columnInfo = new ColumnInfo
                 {
                     entity = entity,
                     name = row["ColumnName"].ToString(),
@@ -145,7 +145,9 @@ namespace EntityGenerator.DAL
                     desc = this.tableLookup[baseTableName].FirstOrDefault(m => m.name == baseColumnName)?.desc ?? row["ColumnName"].ToString(),
                     iskey = Convert.ToBoolean(row["IsKey"]),
                     coltype = commaIndex == -1 ? colType : colType.Substring(0, commaIndex)
-                });
+                };
+                columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                columnList.Add(columnInfo);
             }
 
             return columnList;
@@ -200,7 +202,7 @@ namespace EntityGenerator.DAL
                 string baseTableName = row["BaseTableName"].ToString();
                 string baseColumnName = row["BaseColumnName"].ToString();
 
-                columnList.Add(new ColumnInfo
+                var columnInfo = new ColumnInfo
                 {
                     entity = entity,
                     name = row["ColumnName"].ToString(),
@@ -211,7 +213,9 @@ namespace EntityGenerator.DAL
                     desc = this.tableLookup[baseTableName].FirstOrDefault(m => m.name == baseColumnName)?.desc ?? row["ColumnName"].ToString(),
                     iskey = Convert.ToBoolean(row["IsKey"]),
                     coltype = colType
-                });
+                };
+                columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                columnList.Add(columnInfo);
             }
 
             return columnList;
@@ -259,7 +263,7 @@ namespace EntityGenerator.DAL
 						ELSE [tpes].[name] END AS columnType
                     FROM sys.objects objs
                     INNER JOIN sys.columns cols ON objs.object_id = cols.object_id
-                    INNER JOIN sys.types tpes on cols.system_type_id = tpes.system_type_id AND cols.user_type_id = tpes.user_type_id AND tpes.[name] <> 'sysname'
+                    INNER JOIN sys.types tpes on cols.system_type_id = tpes.system_type_id AND tpes.is_user_defined=CAST(0 AS BIT) AND tpes.[name] <> 'sysname'
                     LEFT OUTER JOIN sys.identity_columns idns ON idns.object_id = objs.object_id AND idns.column_id = cols.column_id
                     LEFT OUTER JOIN sys.extended_properties pros ON pros.major_id = cols.object_id AND pros.minor_id = cols.column_id
                     WHERE objs.[type] = 'U'
@@ -282,7 +286,7 @@ namespace EntityGenerator.DAL
                             iskey = reader.GetInt32(7) > 0,
                             coltype = reader.GetString(8)  
                         };
-                        columnInfo.entityName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
                         columnList.Add(columnInfo);
                     }
                 }
@@ -324,7 +328,7 @@ ORDER BY a.TABLE_NAME",
                             iskey = reader.GetString(7) == "PRI",
                             coltype = reader.GetString(8) 
                         };
-                        columnInfo.entityName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
                         columnList.Add(columnInfo);
                     }
                 }
@@ -387,7 +391,7 @@ ORDER BY a.TABLE_NAME",
                             iskey = reader.GetInt32(7) > 0,
                             inview = true
                         };
-                        columnInfo.entityName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
                         columnList.Add(columnInfo);
                     }
                 }
@@ -430,7 +434,7 @@ ORDER BY a.TABLE_NAME",
                             iskey = reader.GetString(7) == "PRI",
                             coltype = reader.GetString(8)
                         };
-                        columnInfo.entityName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
                         columnList.Add(columnInfo);
                     }
                 }

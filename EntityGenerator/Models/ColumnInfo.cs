@@ -18,9 +18,9 @@ namespace EntityGenerator.Models
         public string name { get; set; }
 
         /// <summary>
-        /// 实体名称
+        /// 属性名
         /// </summary>
-        public string entityName { get; set; }
+        public string fieldName { get; set; }
 
         /// <summary>
         /// 列类型
@@ -81,8 +81,8 @@ namespace EntityGenerator.Models
 
                 return new ColumnEnumListModel
                 {
-                    enumName = this.entityName + "Enums",
-                    columnName = this.entityName + "Enum",
+                    enumName = this.fieldName + "Enums",
+                    columnName = this.fieldName + "Enum",
                     columnEnumInfos = _desc.Split('/').Distinct()
                     .Select(s =>
                     {

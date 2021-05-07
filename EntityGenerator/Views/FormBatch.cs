@@ -97,7 +97,7 @@ namespace EntityGenerator.Views
 
         private List<string> GetExistsEntities()
         {
-            string entitiesDir = txtEntitiesDirectory.Text.Trim();
+            string entitiesDir = _template.path;
             _targetProjectItems = _currentProject.ProjectItems;
             if (entitiesDir.Length != 0)
             {
@@ -143,7 +143,7 @@ namespace EntityGenerator.Views
         {
             try
             {
-                string entitiesDir = txtEntitiesDirectory.Text.Trim();
+                string entitiesDir = _template.path;
 
                 string nameSpaceStr = _rootNamespace;     
                 string path = _currentProject.Properties.Item("FullPath").Value.ToString();
@@ -455,7 +455,7 @@ namespace EntityGenerator.Views
 
             string entityDirectory = ddlViewEntityDirectory.SelectedIndex == 0 ? string.Empty : ddlViewEntityDirectory.SelectedItem.ToString();
             string sqlViewDirectory = cbSqlViewDirectory.SelectedItem.ToString();
-            string nameSpaceStr = txtEntitiesDirectory.Text;
+            string nameSpaceStr = _template.path;
 
             try
             {

@@ -4,7 +4,7 @@
 	  Server=218.107.49.181,1499;Database=CloudSky;Uid=sa;Password=Tycad$202;MultipleActiveResultSets=true;Connection Timeout=300;
   </ConnectionString>
   <Templates>
-    <Template type="1" name="数据库实体" fileName ="{entity}" path="">
+    <Template type="1" name="数据库实体" fileName ="{entity}" path="" classNameFormatter="RemoveSplitChar">
       <![CDATA[
 /* 
  * 本文件的代码自动生成，请勿更改
@@ -51,7 +51,7 @@ namespace $entity.nameSpace
         [Display(Name="$c.name")]
 #end
 #end
-        public $c.clrtype $c.entityName { get; set; }
+        public $c.clrtype $c.fieldName { get; set; }
 
 #end
 

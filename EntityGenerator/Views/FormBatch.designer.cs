@@ -46,9 +46,6 @@
             this.unexistsList = new System.Windows.Forms.CheckedListBox();
             this.tabCreate = new System.Windows.Forms.TabControl();
             this.tabEntity = new System.Windows.Forms.TabPage();
-            this.btnLoad = new System.Windows.Forms.Button();
-            this.txtEntitiesDirectory = new System.Windows.Forms.TextBox();
-            this.lbl_namespace = new System.Windows.Forms.Label();
             this.tabSqlView = new System.Windows.Forms.TabPage();
             this.btnClose2 = new System.Windows.Forms.Button();
             this.ddlViewEntityDirectory = new System.Windows.Forms.ComboBox();
@@ -261,9 +258,6 @@
             // 
             // tabEntity
             // 
-            this.tabEntity.Controls.Add(this.btnLoad);
-            this.tabEntity.Controls.Add(this.txtEntitiesDirectory);
-            this.tabEntity.Controls.Add(this.lbl_namespace);
             this.tabEntity.Controls.Add(this.groupBox1);
             this.tabEntity.Controls.Add(this.btnCancel);
             this.tabEntity.Controls.Add(this.btnRefresh);
@@ -276,32 +270,6 @@
             this.tabEntity.TabIndex = 0;
             this.tabEntity.Text = "DB实体";
             this.tabEntity.UseVisualStyleBackColor = true;
-            // 
-            // btnLoad
-            // 
-            this.btnLoad.Location = new System.Drawing.Point(260, 367);
-            this.btnLoad.Name = "btnLoad";
-            this.btnLoad.Size = new System.Drawing.Size(75, 23);
-            this.btnLoad.TabIndex = 8;
-            this.btnLoad.Text = "加载";
-            this.btnLoad.UseVisualStyleBackColor = true;
-            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
-            // 
-            // txtEntitiesDirectory
-            // 
-            this.txtEntitiesDirectory.Location = new System.Drawing.Point(62, 369);
-            this.txtEntitiesDirectory.Name = "txtEntitiesDirectory";
-            this.txtEntitiesDirectory.Size = new System.Drawing.Size(188, 21);
-            this.txtEntitiesDirectory.TabIndex = 7;
-            // 
-            // lbl_namespace
-            // 
-            this.lbl_namespace.AutoSize = true;
-            this.lbl_namespace.Location = new System.Drawing.Point(3, 372);
-            this.lbl_namespace.Name = "lbl_namespace";
-            this.lbl_namespace.Size = new System.Drawing.Size(65, 12);
-            this.lbl_namespace.TabIndex = 6;
-            this.lbl_namespace.Text = "实体目录：";
             // 
             // tabSqlView
             // 
@@ -533,7 +501,6 @@
             this.groupBox3.ResumeLayout(false);
             this.tabCreate.ResumeLayout(false);
             this.tabEntity.ResumeLayout(false);
-            this.tabEntity.PerformLayout();
             this.tabSqlView.ResumeLayout(false);
             this.tabSqlView.PerformLayout();
             this.groupBox6.ResumeLayout(false);
@@ -580,8 +547,5 @@
         private System.Windows.Forms.ComboBox ddlViewEntityDirectory;
         private System.Windows.Forms.Button btnRemoveSqlViewEntity;
         private System.Windows.Forms.Button btnClose2;
-        private System.Windows.Forms.TextBox txtEntitiesDirectory;
-        private System.Windows.Forms.Label lbl_namespace;
-        private System.Windows.Forms.Button btnLoad;
     }
 }
