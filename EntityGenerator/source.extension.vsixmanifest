@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="EntityGenerator.3eb5be4a-0816-4d30-92e4-3edd9c786feb" Version="2.0.5" Language="zh-CN" Publisher="ATENZA" />
+        <Identity Id="EntityGenerator.3eb5be4a-0816-4d30-92e4-3edd9c786feb" Version="2.1" Language="zh-CN" Publisher="ATENZA" />
         <DisplayName>EntityGenerator</DisplayName>
         <Description xml:space="preserve">数据库实体类生成工具，支持MySql、SqlServer。</Description>
         <Icon>Resources\icon.png</Icon>

@@ -146,7 +146,7 @@ namespace EntityGenerator.DAL
                     iskey = Convert.ToBoolean(row["IsKey"]),
                     coltype = commaIndex == -1 ? colType : colType.Substring(0, commaIndex)
                 };
-                columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                columnInfo.fieldName = columnInfo.name.GetPascalName(NameFormatterType.RemoveSplitCharAndPascal);
                 columnList.Add(columnInfo);
             }
 
@@ -214,7 +214,7 @@ namespace EntityGenerator.DAL
                     iskey = Convert.ToBoolean(row["IsKey"]),
                     coltype = colType
                 };
-                columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                columnInfo.fieldName = columnInfo.name.GetPascalName(NameFormatterType.RemoveSplitCharAndPascal);
                 columnList.Add(columnInfo);
             }
 
@@ -286,7 +286,7 @@ namespace EntityGenerator.DAL
                             iskey = reader.GetInt32(7) > 0,
                             coltype = reader.GetString(8)  
                         };
-                        columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnInfo.fieldName = columnInfo.name.GetPascalName(NameFormatterType.RemoveSplitCharAndPascal);
                         columnList.Add(columnInfo);
                     }
                 }
@@ -328,7 +328,7 @@ ORDER BY a.TABLE_NAME",
                             iskey = reader.GetString(7) == "PRI",
                             coltype = reader.GetString(8) 
                         };
-                        columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnInfo.fieldName = columnInfo.name.GetPascalName(NameFormatterType.RemoveSplitCharAndPascal);
                         columnList.Add(columnInfo);
                     }
                 }
@@ -391,7 +391,7 @@ ORDER BY a.TABLE_NAME",
                             iskey = reader.GetInt32(7) > 0,
                             inview = true
                         };
-                        columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnInfo.fieldName = columnInfo.name.GetPascalName(NameFormatterType.RemoveSplitCharAndPascal);
                         columnList.Add(columnInfo);
                     }
                 }
@@ -434,7 +434,7 @@ ORDER BY a.TABLE_NAME",
                             iskey = reader.GetString(7) == "PRI",
                             coltype = reader.GetString(8)
                         };
-                        columnInfo.fieldName = columnInfo.name.GetPascalName(EntityNameFormatting);
+                        columnInfo.fieldName = columnInfo.name.GetPascalName(NameFormatterType.RemoveSplitCharAndPascal);
                         columnList.Add(columnInfo);
                     }
                 }
