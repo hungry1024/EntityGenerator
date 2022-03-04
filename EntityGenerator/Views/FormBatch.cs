@@ -1,4 +1,5 @@
 ﻿using EntityGenerator.DAL;
+using EntityGenerator.Extents;
 using EntityGenerator.Models;
 using EntityGenerator.Services;
 using EntityGenerator.Utilities;
@@ -9,9 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using EntityGenerator.Extents;
-using System.Reflection;
-using Microsoft.VisualStudio.ProjectSystem;
 
 namespace EntityGenerator.Views
 {
@@ -97,6 +95,8 @@ namespace EntityGenerator.Views
 
         private List<string> GetExistsEntities()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             string entitiesDir = _template.path;
             _targetProjectItems = _currentProject.ProjectItems;
             if (entitiesDir.Length != 0)
@@ -141,6 +141,8 @@ namespace EntityGenerator.Views
 
         private void btnRefresh_Click(object sender, EventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             try
             {
                 string entitiesDir = _template.path;
@@ -412,6 +414,8 @@ namespace EntityGenerator.Views
 
         private void btnRemoveSqlViewEntity_Click(object sender, EventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var entities = GetCheckedItems(this.cbSqlViewNotExists);
 
             ProjectItems items = null;

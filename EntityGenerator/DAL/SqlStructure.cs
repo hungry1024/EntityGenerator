@@ -18,8 +18,6 @@ namespace EntityGenerator.DAL
         private ILookup<string, ColumnInfo> tableLookup;
         private ILookup<string, ColumnInfo> viewLookup;
 
-        private List<ForeignInfo> foreignList;
-
         private Dictionary<string, string> tableComments;
 
         private readonly IDbConnection _connection;
@@ -74,13 +72,7 @@ namespace EntityGenerator.DAL
 
         public List<string> Views { get { return viewList; } }
 
-        public List<ForeignInfo> ForeignList
-        {
-            get
-            {
-                return foreignList;
-            }
-        }
+        //public List<ForeignInfo> ForeignList { get; private set; }
 
         public IEnumerable<ColumnInfo> GetColumns(string table)
         {

@@ -64,13 +64,7 @@ namespace EntityGenerator
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.package;
-            }
-        }
+        private IAsyncServiceProvider ServiceProvider => package;
 
         /// <summary>
         /// Initializes the singleton instance of the command.
@@ -165,7 +159,7 @@ namespace EntityGenerator
         private void UpdateCallback(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            DTE dte = ServiceProvider.GetServiceAsync(typeof(DTE)).Result as DTE;
+            DTE dte = package.GetServiceAsync(typeof(DTE)).Result as DTE;
             if (dte == null)
                 return;
 
@@ -276,6 +270,7 @@ namespace EntityGenerator
         /// <returns></returns>
         public string GetActiveDocument()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             DTE dte = ServiceProvider.GetServiceAsync(typeof(DTE)) as DTE;
             if (dte == null)
                 return string.Empty;
@@ -300,6 +295,8 @@ namespace EntityGenerator
 
         public string GetSelectedProjectPath()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var items = (Array)DTEHelper.DTE2.ToolWindows.SolutionExplorer.SelectedItems;
             foreach (UIHierarchyItem selItem in items)
             {
