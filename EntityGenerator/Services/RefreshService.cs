@@ -29,7 +29,7 @@ namespace EntityGenerator.Services
                     name = table,
                     className = className,
                     comment = comment ?? table,
-                    cols = columns,
+                    cols = columns.OrderByDescending(m => m.iskey),
                     sql = sql,
                     hasEnums = enumLists != null && enumLists.Count() > 0,
                     enumLists = enumLists
