@@ -19,7 +19,16 @@ namespace EntityGenerator.Extents
             }
 
             if (!name.Contains("_"))
+            {
+                if(name.Any(c => char.IsUpper(c)))
+                {
+                    return name;
+                }
+
                 return Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(name);
+            }
+                
+
             StringBuilder builder = new StringBuilder();
 
             var nameList = name.Split('_').ToList();
